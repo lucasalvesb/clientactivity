@@ -15,7 +15,7 @@ namespace FI.AtividadeEntrevista.DAL
         {
             get
             {
-                ConnectionStringSettings conn = System.Configuration.ConfigurationManager.ConnectionStrings["BancoDeDados"];
+                ConnectionStringSettings conn = ConfigurationManager.ConnectionStrings["BancoDeDados"];
                 if (conn != null)
                     return conn.ConnectionString;
                 else
@@ -28,7 +28,7 @@ namespace FI.AtividadeEntrevista.DAL
             SqlCommand comando = new SqlCommand();
             SqlConnection conexao = new SqlConnection(stringDeConexao);
             comando.Connection = conexao;
-            comando.CommandType = System.Data.CommandType.StoredProcedure;
+            comando.CommandType = CommandType.StoredProcedure;
             comando.CommandText = NomeProcedure;
             foreach (var item in parametros)
                 comando.Parameters.Add(item);
@@ -50,7 +50,7 @@ namespace FI.AtividadeEntrevista.DAL
             SqlConnection conexao = new SqlConnection(stringDeConexao);
 
             comando.Connection = conexao;
-            comando.CommandType = System.Data.CommandType.StoredProcedure;
+            comando.CommandType = CommandType.StoredProcedure;
             comando.CommandText = NomeProcedure;
             foreach (var item in parametros)
                 comando.Parameters.Add(item);
@@ -60,7 +60,7 @@ namespace FI.AtividadeEntrevista.DAL
             conexao.Open();
 
             try
-            {               
+            {
                 adapter.Fill(ds);
             }
             finally
@@ -71,5 +71,18 @@ namespace FI.AtividadeEntrevista.DAL
             return ds;
         }
 
+        internal bool VerificarCPFDuplicado(string cpf)
+        {
+            using (SqlConnection conexao = new SqlConnection(stringDeConexao))
+            {
+                SqlCommand comando = new SqlCommand("SELECT 1 FROM Clientes WHERE CPF = @CPF", conexao);
+                comando.Parameters.AddWithValue("@CPF", cpf);
+                conexao.Open();
+                using (SqlDataReader reader = comando.ExecuteReader())
+                {
+                    return reader.HasRows; 
+                }
+            }
+        }
     }
 }

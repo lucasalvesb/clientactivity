@@ -35,21 +35,21 @@ namespace WebAtividadeEntrevista.Controllers
             if (!validarCPFAttribute.IsValid(model.CPF))
             {
                 Response.StatusCode = 400;
-                return Json("CPF inválido");
+                return Json(new { success = false, message = "CPF inválido" });
             }
 
-            if (!this.ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
                 List<string> erros = (from item in ModelState.Values
                                       from error in item.Errors
                                       select error.ErrorMessage).ToList();
 
                 Response.StatusCode = 400;
-                return Json(string.Join(Environment.NewLine, erros));
+                return Json(new { success = false, message = string.Join(Environment.NewLine, erros) });
             }
             else
             {
-                model.Id = bo.Incluir(new Cliente()
+                long clientId = bo.Incluir(new Cliente()
                 {
                     CEP = model.CEP,
                     CPF = model.CPF,
@@ -63,7 +63,12 @@ namespace WebAtividadeEntrevista.Controllers
                     Telefone = model.Telefone
                 });
 
-                return Json("Cadastro efetuado com sucesso");
+                if (clientId == -1)
+                {
+                    return Json(new { success = false, message = "CPF já cadastrado" });
+                }
+
+                return Json(new { success = true, message = "Cadastro efetuado com sucesso", clientId = clientId });
             }
         }
 

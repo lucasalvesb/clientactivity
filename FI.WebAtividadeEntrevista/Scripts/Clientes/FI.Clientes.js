@@ -20,15 +20,20 @@
             url: urlPost,
             method: "POST",
             data: formData,
-            error: function (r) {
-                if (r.status == 400)
-                    ModalDialog("Ocorreu um erro", r.responseJSON);
-                else if (r.status == 500)
+            error: function (xhr) {
+                if (xhr.status == 400) {
+                    ModalDialog("Erro", "CPF já cadastrado");
+                } else if (xhr.status == 500) {
                     ModalDialog("Ocorreu um erro", "Ocorreu um erro interno no servidor.");
+                }
             },
-            success: function (r) {
-                ModalDialog("Sucesso!", r)
-                $("#formCadastro")[0].reset();
+            success: function (response) {
+                if (response.success) {
+                    ModalDialog("Sucesso!", "Cadastro efetuado com sucesso");
+                    $("#formCadastro")[0].reset();
+                } else {
+                    ModalDialog("Atenção!", response.message);
+                }
             }
         });
     });

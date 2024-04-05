@@ -58,3 +58,26 @@ function ModalDialog(titulo, texto) {
     $('body').append(texto);
     $('#' + random).modal('show');
 }
+
+const cpfInput = document.getElementById('CPF');
+
+cpfInput.addEventListener('input', function (event) {
+    let value = event.target.value.replace(/\D/g, ''); 
+
+    if (value.length > 11) {
+        value = value.slice(0, 11); 
+    }
+
+
+    let formattedCPF = '';
+    for (let i = 0; i < value.length; i++) {
+        if (i === 3 || i === 6) {
+            formattedCPF += '.';
+        } else if (i === 9) {
+            formattedCPF += '-';
+        }
+        formattedCPF += value[i];
+    }
+
+    event.target.value = formattedCPF;
+});

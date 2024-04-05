@@ -1,11 +1,16 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.27130.2027
+# Visual Studio Version 17
+VisualStudioVersion = 17.8.34316.72
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebAtividadeEntrevista", "FI.WebAtividadeEntrevista\WebAtividadeEntrevista.csproj", "{465BF3DA-5F32-456E-95C5-DD9CBF4B3A2D}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FI.AtividadeEntrevista", "FI.AtividadeEntrevista\FI.AtividadeEntrevista.csproj", "{38EFE996-02D9-4D78-B084-F3B5602E6ED2}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Itens de Solução", "Itens de Solução", "{8BF26988-62E9-4A6C-A15A-EA1C40D98770}"
+	ProjectSection(SolutionItems) = preProject
+		.gitignore = .gitignore
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

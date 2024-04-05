@@ -28,7 +28,7 @@ namespace WebAtividadeEntrevista.Controllers
         {
             BoCliente bo = new BoCliente();
 
-            string cleanCPF = RemoveNonNumericCharacters(model.CPF);
+            string cleanCPF = RemoverCaracteresNaoNumericos(model.CPF);
 
             var validarCPFAttribute = new ValidarCPFAttribute();
 
@@ -67,7 +67,7 @@ namespace WebAtividadeEntrevista.Controllers
             }
         }
 
-        private string RemoveNonNumericCharacters(string input)
+        private string RemoverCaracteresNaoNumericos(string input)
         {
             StringBuilder sb = new StringBuilder();
             foreach (char c in input)
@@ -132,7 +132,7 @@ namespace WebAtividadeEntrevista.Controllers
 
             if (cliente != null)
             {
-                string formattedCPF = FormatCPF(cliente.CPF);
+                string formattedCPF = FormataCPF(cliente.CPF);
 
                 model = new ClienteModel()
                 {
@@ -153,7 +153,7 @@ namespace WebAtividadeEntrevista.Controllers
             return View(model);
         }
 
-        private string FormatCPF(string cpf)
+        private string FormataCPF(string cpf)
         {
             if (cpf == null || cpf.Length != 11)
                 return cpf;

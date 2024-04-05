@@ -193,6 +193,31 @@ namespace WebAtividadeEntrevista.Controllers
             }
         }
 
+        [HttpPost]
+        public JsonResult AddBeneficiary(BeneficiarioModel model)
+        {
+            string cleanCPF = RemoverCaracteresNaoNumericos(model.CPF);
+
+            var validarCPFAttribute = new ValidarCPFAttribute();
+
+            if (!validarCPFAttribute.IsValid(model.CPF))
+            {
+                Response.StatusCode = 400;
+                return Json(new { success = false, message = "CPF inválido" });
+            }
+
+            BoBeneficiario bo = new BoBeneficiario();
+            long beneficiaryId = bo.Incluir(new Beneficiario()
+            {
+                CPF = model.CPF,
+                Nome = model.Nome,
+                IdCliente = model.IdCliente,
+                Id = model.Id,
+
+            });
+
+            return Json(new { success = true, message = "Beneficiário adicionado com sucesso", beneficiaryId = beneficiaryId });
+        }
 
     }
 }

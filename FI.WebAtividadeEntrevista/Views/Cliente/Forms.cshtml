@@ -94,7 +94,8 @@
     </div>
 </form>
 
-<!-- desculpa pela bagunça, tempo bem curto. por algum motivo o bootstrap não tá aplicando o pt-5 que desejo ali na div do button-->
+<!-- desculpa pela bagunça, tempo bem curto. por algum motivo o bootstrap não tá aplicando o pt-5 que desejo ali na div do button
+    e não consigo criar um helpers.js e exportá-los pra modularizar o código, repeti bastante coisa-->
 <style>
     .custom-pt {
         padding-top: 26px !important;
@@ -114,13 +115,13 @@
                 <div class="form-group row">
                     <div class="col-md-4">
                         <label for="cpf">CPF:</label>
-                        <input type="text" class="form-control" id="cpf">
+                        <input type="text" class="form-control" id="cpfModal">
                     </div>
                     <div class="col-md-4">
                         <label for="nome">Nome:</label>
                         <input type="text" class="form-control" id="nome">
                     </div>
-                    <div class="pt-4 col-md-4">
+                    <div class="col-md-4 custom-pt">
                         <button type="button" class="btn btn-sm btn-success" onclick="incluirBeneficiario()">Incluir</button>
                     </div>
                 </div>
@@ -149,7 +150,7 @@
     }
 
     function incluirBeneficiario() {
-        var cpf = $('#cpf').val();
+        var cpfModal = $('#cpfModal').val();
         var nome = $('#nome').val();
 
         if ($('#beneficiariosGrid tbody').length == 0) {
@@ -158,12 +159,12 @@
 
         $('#beneficiariosGrid tbody').append(
             $('<tr>').append(
-                $('<td>').text(nome),
-                $('<td>').text(cpf)
+                $('<td>').text(cpfModal),
+                $('<td>').text(nome)
             )
         );
 
-        $('#cpf').val('');
+        $('#cpfModal').val('');
         $('#nome').val('');
 
     }

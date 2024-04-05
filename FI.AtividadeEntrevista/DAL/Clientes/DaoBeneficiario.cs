@@ -29,7 +29,7 @@ namespace FI.AtividadeEntrevista.DAL
             return ret;
         }
 
-        internal Beneficiario Consultar(long id)
+        internal List<Beneficiario> Consultar(long id)
         {
             List<System.Data.SqlClient.SqlParameter> parametros = new List<System.Data.SqlClient.SqlParameter>();
 
@@ -38,7 +38,7 @@ namespace FI.AtividadeEntrevista.DAL
             DataSet ds = base.Consultar("FI_SP_ConsBeneficiario", parametros);
             List<Beneficiario> beneficiarios = Converter(ds);
 
-            return beneficiarios.FirstOrDefault();
+            return beneficiarios;
         }
 
         internal List<Beneficiario> Listar()

@@ -24,15 +24,16 @@ namespace WebAtividadeEntrevista.Controllers
         }
 
         [HttpPost]
-        public JsonResult Incluir(ClienteModel model)
+        public JsonResult Incluir(ClienteModel clienteModel, BeneficiarioModel beneficiarioModel, string[] CPFBeneficiario, string[] NomeBeneficiario)
         {
-            BoCliente bo = new BoCliente();
+            BoCliente boCliente = new BoCliente();
+            BoBeneficiario boBeneficiario = new BoBeneficiario();
 
-            string cleanCPF = RemoverCaracteresNaoNumericos(model.CPF);
-
+            // Validate client CPF
+            string cleanCPF = RemoverCaracteresNaoNumericos(clienteModel.CPF);
             var validarCPFAttribute = new ValidarCPFAttribute();
-
-            if (!validarCPFAttribute.IsValid(model.CPF))
+    
+            if (!validarCPFAttribute.IsValid(clienteModel.CPF))
             {
                 Response.StatusCode = 400;
                 return Json(new { success = false, message = "CPF inválido" });
@@ -40,6 +41,7 @@ namespace WebAtividadeEntrevista.Controllers
 
             if (!ModelState.IsValid)
             {
+                // If client model is not valid, return error messages
                 List<string> erros = (from item in ModelState.Values
                                       from error in item.Errors
                                       select error.ErrorMessage).ToList();
@@ -49,25 +51,51 @@ namespace WebAtividadeEntrevista.Controllers
             }
             else
             {
-                long clientId = bo.Incluir(new Cliente()
+                // Insert client data
+                long clientId = boCliente.Incluir(new Cliente()
                 {
-                    CEP = model.CEP,
-                    CPF = model.CPF,
-                    Cidade = model.Cidade,
-                    Email = model.Email,
-                    Estado = model.Estado,
-                    Logradouro = model.Logradouro,
-                    Nacionalidade = model.Nacionalidade,
-                    Nome = model.Nome,
-                    Sobrenome = model.Sobrenome,
-                    Telefone = model.Telefone
+                    CEP = clienteModel.CEP,
+                    CPF = clienteModel.CPF,
+                    Cidade = clienteModel.Cidade,
+                    Email = clienteModel.Email,
+                    Estado = clienteModel.Estado,
+                    Logradouro = clienteModel.Logradouro,
+                    Nacionalidade = clienteModel.Nacionalidade,
+                    Nome = clienteModel.Nome,
+                    Sobrenome = clienteModel.Sobrenome,
+                    Telefone = clienteModel.Telefone
                 });
 
                 if (clientId == -1)
                 {
+                    // If client already exists, return error
                     return Json(new { success = false, message = "CPF já cadastrado" });
                 }
 
+                // Insert beneficiary data
+                if (beneficiarioModel != null)
+                {
+                    string cleanBeneficiaryCPF = RemoverCaracteresNaoNumericos(beneficiarioModel.CPF);
+
+                    if (!validarCPFAttribute.IsValid(beneficiarioModel.CPF))
+                    {
+                        // If beneficiary CPF is invalid, return error
+                        Response.StatusCode = 400;
+                        return Json(new { success = false, message = "CPF de beneficiário inválido" });
+                    }
+
+                    for (int i = 0; i < clienteModel.CPFBeneficiario.Length; i++)
+                    {
+                        boBeneficiario.Incluir(new Beneficiario()
+                        {
+                            CPF = clienteModel.CPFBeneficiario[i],
+                            Nome = clienteModel.NomeBeneficiario[i],
+                            IdCliente = clientId
+                        });
+                    }
+                }
+
+                // Return success message along with client ID
                 return Json(new { success = true, message = "Cadastro efetuado com sucesso", clientId = clientId });
             }
         }
@@ -88,7 +116,8 @@ namespace WebAtividadeEntrevista.Controllers
         [HttpPost]
         public JsonResult Alterar(ClienteModel model)
         {
-            BoCliente bo = new BoCliente();
+            BoCliente boCliente = new BoCliente();
+            BoBeneficiario boBeneficiario = new BoBeneficiario();
 
             var validarCPFAttribute = new ValidarCPFAttribute();
 
@@ -109,7 +138,8 @@ namespace WebAtividadeEntrevista.Controllers
             }
             else
             {
-                bo.Alterar(new Cliente()
+                // Update client data
+                boCliente.Alterar(new Cliente()
                 {
                     Id = model.Id,
                     CPF = model.CPF,
@@ -123,7 +153,21 @@ namespace WebAtividadeEntrevista.Controllers
                     Sobrenome = model.Sobrenome,
                     Telefone = model.Telefone
                 });
-                               
+
+                // Update beneficiary data
+                if (model.CPFBeneficiario != null && model.NomeBeneficiario != null)
+                {
+                    for (int i = 0; i < model.CPFBeneficiario.Length; i++)
+                    {
+                        boBeneficiario.Alterar(new Beneficiario()
+                        {
+                            CPF = model.CPFBeneficiario[i],
+                            Nome = model.NomeBeneficiario[i],
+                            IdCliente = model.Id
+                        });
+                    }
+                }
+
                 return Json("Cadastro alterado com sucesso");
             }
         }
@@ -131,8 +175,10 @@ namespace WebAtividadeEntrevista.Controllers
         [HttpGet]
         public ActionResult Alterar(long id)
         {
-            BoCliente bo = new BoCliente();
-            Cliente cliente = bo.Consultar(id);
+            BoCliente boCliente = new BoCliente();
+            BoBeneficiario boBeneficiario = new BoBeneficiario();
+
+            Cliente cliente = boCliente.Consultar(id);
             Models.ClienteModel model = null;
 
             if (cliente != null)
@@ -142,7 +188,7 @@ namespace WebAtividadeEntrevista.Controllers
                 model = new ClienteModel()
                 {
                     Id = cliente.Id,
-                    CPF = formattedCPF, 
+                    CPF = formattedCPF,
                     CEP = cliente.CEP,
                     Cidade = cliente.Cidade,
                     Email = cliente.Email,
@@ -153,10 +199,19 @@ namespace WebAtividadeEntrevista.Controllers
                     Sobrenome = cliente.Sobrenome,
                     Telefone = cliente.Telefone
                 };
+
+                // Retrieve beneficiary data
+                List<Beneficiario> beneficiarios = boBeneficiario.Consultar(cliente.Id);
+                if (beneficiarios != null && beneficiarios.Any())
+                {
+                    model.CPFBeneficiario = beneficiarios.Select(b => b.CPF).ToArray();
+                    model.NomeBeneficiario = beneficiarios.Select(b => b.Nome).ToArray();
+                }
             }
 
             return View(model);
         }
+
 
         private string FormataCPF(string cpf)
         {
@@ -193,31 +248,31 @@ namespace WebAtividadeEntrevista.Controllers
             }
         }
 
-        [HttpPost]
-        public JsonResult AddBeneficiary(BeneficiarioModel model)
-        {
-            string cleanCPF = RemoverCaracteresNaoNumericos(model.CPF);
+        //[HttpPost]
+        //public JsonResult AddBeneficiary(BeneficiarioModel model)
+        //{
+        //    string cleanCPF = RemoverCaracteresNaoNumericos(model.CPF);
 
-            var validarCPFAttribute = new ValidarCPFAttribute();
+        //    var validarCPFAttribute = new ValidarCPFAttribute();
 
-            if (!validarCPFAttribute.IsValid(model.CPF))
-            {
-                Response.StatusCode = 400;
-                return Json(new { success = false, message = "CPF inválido" });
-            }
+        //    if (!validarCPFAttribute.IsValid(model.CPF))
+        //    {
+        //        Response.StatusCode = 400;
+        //        return Json(new { success = false, message = "CPF inválido" });
+        //    }
 
-            BoBeneficiario bo = new BoBeneficiario();
-            long beneficiaryId = bo.Incluir(new Beneficiario()
-            {
-                CPF = model.CPF,
-                Nome = model.Nome,
-                IdCliente = model.IdCliente,
-                Id = model.Id,
+        //    BoBeneficiario bo = new BoBeneficiario();
+        //    long beneficiaryId = bo.Incluir(new Beneficiario()
+        //    {
+        //        CPF = model.CPF,
+        //        Nome = model.Nome,
+        //        IdCliente = model.IdCliente,
+        //        Id = model.Id,
 
-            });
+        //    });
 
-            return Json(new { success = true, message = "Beneficiário adicionado com sucesso", beneficiaryId = beneficiaryId });
-        }
+        //    return Json(new { success = true, message = "Beneficiário adicionado com sucesso", beneficiaryId = beneficiaryId });
+        //}
 
     }
 }

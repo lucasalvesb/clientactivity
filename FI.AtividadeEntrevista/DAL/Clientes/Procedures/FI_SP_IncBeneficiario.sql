@@ -1,0 +1,18 @@
+﻿CREATE PROC FI_SP_IncBeneficiario
+    @Nome     VARCHAR(50),
+    @CPF      VARCHAR(11),
+    @IdCliente BIGINT
+AS
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM BENEFICIARIOS WHERE CPF = @CPF)
+    BEGIN
+        INSERT INTO BENEFICIARIOS (NOME, CPF, IDCLIENTE)
+        VALUES (@Nome, @CPF, @IdCliente)
+
+        SELECT SCOPE_IDENTITY() AS 'ID'
+    END
+    ELSE
+    BEGIN
+        SELECT -1 AS 'ID' 
+    END
+END

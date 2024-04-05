@@ -73,7 +73,16 @@ namespace WebAtividadeEntrevista.Models
         /// </summary>
         public string Telefone { get; set; }
 
+        /// <summary>
+        /// CPF do Beneficiário
+        /// </summary>
+        [ValidarCPF(ErrorMessage = "O CPF é inválido.")]
+        public string[] CPFBeneficiario { get; set; }
 
+        /// <summary>
+        /// Nome do Beneficiário
+        /// </summary>
+        public string[] NomeBeneficiario { get; set; }
 
     }
 }

@@ -12,8 +12,19 @@
             "Estado": $(this).find("#Estado").val(),
             "Cidade": $(this).find("#Cidade").val(),
             "Logradouro": $(this).find("#Logradouro").val(),
-            "Telefone": $(this).find("#Telefone").val()
+            "Telefone": $(this).find("#Telefone").val(),
+            "CPFBeneficiario": [], 
+            "NomeBeneficiario": [] 
         };
+
+
+        $('#beneficiariosGrid tbody tr').each(function () {
+            var cpfModal = $(this).find('td:eq(0)').text(); 
+            var nomeModal = $(this).find('td:eq(1)').text(); 
+            formData.CPFBeneficiario.push(cpfModal);
+            formData.NomeBeneficiario.push(nomeModal);
+        });
+
         console.log("Form Data:", formData);
 
         $.ajax({
@@ -22,7 +33,7 @@
             data: formData,
             error: function (xhr) {
                 if (xhr.status == 400) {
-                    ModalDialog("Erro", "CPF já cadastrado");
+                    ModalDialog("Erro", "CPF inválido");
                 } else if (xhr.status == 500) {
                     ModalDialog("Ocorreu um erro", "Ocorreu um erro interno no servidor.");
                 }

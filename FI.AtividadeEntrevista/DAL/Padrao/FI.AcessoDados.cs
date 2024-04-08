@@ -71,7 +71,7 @@ namespace FI.AtividadeEntrevista.DAL
             return ds;
         }
 
-        internal bool VerificarCPFDuplicado(string cpf)
+        internal bool VerificarCPFDuplicadoClientes(string cpf)
         {
             using (SqlConnection conexao = new SqlConnection(stringDeConexao))
             {
@@ -81,6 +81,20 @@ namespace FI.AtividadeEntrevista.DAL
                 using (SqlDataReader reader = comando.ExecuteReader())
                 {
                     return reader.HasRows; 
+                }
+            }
+        }
+
+        internal bool VerificarCPFDuplicadoBeneficiarios(string cpf)
+        {
+            using (SqlConnection conexao = new SqlConnection(stringDeConexao))
+            {
+                SqlCommand comando = new SqlCommand("SELECT 1 FROM Beneficiarios WHERE CPF = @CPF", conexao);
+                comando.Parameters.AddWithValue("@CPF", cpf);
+                conexao.Open();
+                using (SqlDataReader reader = comando.ExecuteReader())
+                {
+                    return reader.HasRows;
                 }
             }
         }

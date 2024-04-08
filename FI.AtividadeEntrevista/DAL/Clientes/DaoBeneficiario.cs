@@ -11,7 +11,7 @@ namespace FI.AtividadeEntrevista.DAL
     {
         internal long Incluir(DML.Beneficiario beneficiario)
         {
-            if (VerificarCPFDuplicado(beneficiario.CPF))
+            if (VerificarCPFDuplicadoBeneficiarios(beneficiario.CPF))
             {
                 return -1;
             }
@@ -29,11 +29,11 @@ namespace FI.AtividadeEntrevista.DAL
             return ret;
         }
 
-        internal List<Beneficiario> Consultar(long id)
+        internal List<Beneficiario> Consultar(long IdCliente)
         {
             List<System.Data.SqlClient.SqlParameter> parametros = new List<System.Data.SqlClient.SqlParameter>();
 
-            parametros.Add(new System.Data.SqlClient.SqlParameter("Id", id));
+            parametros.Add(new System.Data.SqlClient.SqlParameter("IdCliente", IdCliente));
 
             DataSet ds = base.Consultar("FI_SP_ConsBeneficiario", parametros);
             List<Beneficiario> beneficiarios = Converter(ds);
@@ -82,7 +82,7 @@ namespace FI.AtividadeEntrevista.DAL
                 foreach (DataRow row in ds.Tables[0].Rows)
                 {
                     Beneficiario beneficiario = new Beneficiario();
-                    beneficiario.Id = row.Field<long>("Id");
+                    beneficiario.Id = row.Field<long>("IdCliente");
                     beneficiario.Nome = row.Field<string>("Nome");
                     beneficiario.CPF = row.Field<string>("CPF");
                     beneficiario.IdCliente = row.Field<long>("IdCliente");

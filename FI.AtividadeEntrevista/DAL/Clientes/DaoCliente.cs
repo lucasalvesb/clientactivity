@@ -19,7 +19,7 @@ namespace FI.AtividadeEntrevista.DAL
         /// <param name="cliente">Objeto de cliente</param>
         internal long Incluir(DML.Cliente cliente)
         {
-            if (VerificarCPFDuplicado(cliente.CPF))
+            if (VerificarCPFDuplicadoClientes(cliente.CPF))
             {
                 return -1;
             }
